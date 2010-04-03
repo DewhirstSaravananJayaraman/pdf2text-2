@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project name="pdf2text" default="all">
+	
+	<!-- =================================================== -->
+	<!-- Target: prepare                                     -->
+	<!-- =================================================== -->
+	<target name="prepare">
+		<echo msg="Removing existing ../build directory" />
+		<delete dir="../build" includeemptydirs="true" verbose="true" failonerror="true" />
+		<echo msg="Making directory ../build" />
+		<mkdir dir="../build" />
+	</target>
+	
+	<!-- =================================================== -->
+	<!-- Target: codesniffer                                 -->
+	<!-- =================================================== -->
+	<target name="codesniffer" depends="prepare">
+		<echo msg="Running PHP codesniffer..." />
+		<phpcodesniffer standard="ZEND"
+			file="../TChester/Pdf2Text.php" allowedFileExtensions="php">
+			<formatter type="report" outfile="../build/codesniffer_report.txt" />
+			<formatter type="summary" usefile="false" />
+		</phpcodesniffer>
+		<echo msg="Output in build directory" />
+	</target>
+	
+	<!-- =================================================== -->
+	<!-- Target: all (DEFAULT)                               -->
+	<!-- =================================================== -->
+	<target name="all" depends="codesniffer">
+	
+	</target>
+	
+</project>

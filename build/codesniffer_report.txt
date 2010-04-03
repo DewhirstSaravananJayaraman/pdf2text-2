@@ -1,0 +1,22 @@
+
+FILE: /Users/tjchester/Sites/pdf2text/TChester/Pdf2Text.php
+--------------------------------------------------------------------------------
+FOUND 0 ERROR(S) AND 15 WARNING(S) AFFECTING 15 LINE(S)
+--------------------------------------------------------------------------------
+ 143 | WARNING | Line exceeds 80 characters; contains 88 characters
+ 147 | WARNING | Line exceeds 80 characters; contains 92 characters
+ 150 | WARNING | Line exceeds 80 characters; contains 90 characters
+ 153 | WARNING | Line exceeds 80 characters; contains 89 characters
+ 317 | WARNING | Line exceeds 80 characters; contains 82 characters
+ 319 | WARNING | Line exceeds 80 characters; contains 84 characters
+ 326 | WARNING | Line exceeds 80 characters; contains 84 characters
+ 331 | WARNING | Line exceeds 80 characters; contains 84 characters
+ 336 | WARNING | Line exceeds 80 characters; contains 84 characters
+ 341 | WARNING | Line exceeds 80 characters; contains 84 characters
+ 433 | WARNING | Line exceeds 80 characters; contains 82 characters
+ 468 | WARNING | Line exceeds 80 characters; contains 82 characters
+ 472 | WARNING | Line exceeds 80 characters; contains 82 characters
+ 528 | WARNING | Line exceeds 80 characters; contains 88 characters
+ 581 | WARNING | Line exceeds 80 characters; contains 82 characters
+--------------------------------------------------------------------------------
+
