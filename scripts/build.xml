@@ -10,6 +10,8 @@
 		<delete dir="../build" includeemptydirs="true" verbose="true" failonerror="true" />
 		<echo msg="Making directory ../build" />
 		<mkdir dir="../build" />
+		<echo msg="Making directory ../build/apidocs" />
+		<mkdir dir="../build/apidocs" />
 	</target>
 	
 	<!-- =================================================== -->
@@ -19,16 +21,33 @@
 		<echo msg="Running PHP codesniffer..." />
 		<phpcodesniffer standard="ZEND"
 			file="../TChester/Pdf2Text.php" allowedFileExtensions="php">
-			<formatter type="report" outfile="../build/codesniffer_report.txt" />
+			<formatter type="full" outfile="../build/codesniffer_report.txt" />
 			<formatter type="summary" usefile="false" />
 		</phpcodesniffer>
 		<echo msg="Output in build directory" />
 	</target>
 	
 	<!-- =================================================== -->
+	<!-- Target: phpdocs                                     -->
+	<!-- =================================================== -->
+	<target name="phpdocs" depends="prepare">
+		<echo msg="Generating PHP docs..." />
+		<phpdoc title="API Documentation"
+		  destdir="../build/apidocs"
+		  sourcecode="true"
+		  undocumentedelements="true"
+		  output="HTML:SMARTY:PHP">
+		   <fileset dir="../TChester">
+		      <include name="**/*.php" />
+		   </fileset>
+		</phpdoc>
+		<echo msg="Output in build directory" />
+	</target>
+	
+	<!-- =================================================== -->
 	<!-- Target: all (DEFAULT)                               -->
 	<!-- =================================================== -->
-	<target name="all" depends="codesniffer">
+	<target name="all" depends="codesniffer,phpdocs">
 	
 	</target>
 	

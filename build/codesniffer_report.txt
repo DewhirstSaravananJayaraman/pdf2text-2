@@ -1,22 +1,25 @@
-
 FILE: /Users/tjchester/Sites/pdf2text/TChester/Pdf2Text.php
 --------------------------------------------------------------------------------
-FOUND 0 ERROR(S) AND 15 WARNING(S) AFFECTING 15 LINE(S)
+FOUND 1 ERROR(S) AND 18 WARNING(S) AFFECTING 19 LINE(S)
 --------------------------------------------------------------------------------
- 143 | WARNING | Line exceeds 80 characters; contains 88 characters
- 147 | WARNING | Line exceeds 80 characters; contains 92 characters
- 150 | WARNING | Line exceeds 80 characters; contains 90 characters
- 153 | WARNING | Line exceeds 80 characters; contains 89 characters
- 317 | WARNING | Line exceeds 80 characters; contains 82 characters
- 319 | WARNING | Line exceeds 80 characters; contains 84 characters
- 326 | WARNING | Line exceeds 80 characters; contains 84 characters
- 331 | WARNING | Line exceeds 80 characters; contains 84 characters
- 336 | WARNING | Line exceeds 80 characters; contains 84 characters
- 341 | WARNING | Line exceeds 80 characters; contains 84 characters
- 433 | WARNING | Line exceeds 80 characters; contains 82 characters
- 468 | WARNING | Line exceeds 80 characters; contains 82 characters
- 472 | WARNING | Line exceeds 80 characters; contains 82 characters
- 528 | WARNING | Line exceeds 80 characters; contains 88 characters
- 581 | WARNING | Line exceeds 80 characters; contains 82 characters
+    1 | ERROR   | End of line character is invalid; expected "\n" but found
+      |         | "\r\n"
+  395 | WARNING | Line exceeds 80 characters; contains 82 characters
+  439 | WARNING | Line exceeds 80 characters; contains 88 characters
+  443 | WARNING | Line exceeds 80 characters; contains 92 characters
+  446 | WARNING | Line exceeds 80 characters; contains 90 characters
+  449 | WARNING | Line exceeds 80 characters; contains 89 characters
+  722 | WARNING | Line exceeds 80 characters; contains 82 characters
+  724 | WARNING | Line exceeds 80 characters; contains 84 characters
+  731 | WARNING | Line exceeds 80 characters; contains 84 characters
+  736 | WARNING | Line exceeds 80 characters; contains 84 characters
+  741 | WARNING | Line exceeds 80 characters; contains 84 characters
+  746 | WARNING | Line exceeds 80 characters; contains 84 characters
+  848 | WARNING | Line exceeds 80 characters; contains 82 characters
+  886 | WARNING | Line exceeds 80 characters; contains 82 characters
+  890 | WARNING | Line exceeds 80 characters; contains 82 characters
+  946 | WARNING | Line exceeds 80 characters; contains 84 characters
+  971 | WARNING | Line exceeds 80 characters; contains 92 characters
+  973 | WARNING | Line exceeds 80 characters; contains 84 characters
+ 1042 | WARNING | Line exceeds 80 characters; contains 82 characters
 --------------------------------------------------------------------------------
-

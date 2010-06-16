@@ -1,61 +1,200 @@
 <?php
 /**
- * Copyright 2009 Thomas Chester
+ * Copyright 2009, Thomas Chester
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @package Pdf2Text
+ * @author Thomas Chester
+ * @link https://launchpad.net/pdf2text Pdf2Text Project
+ * @copyright Copyright 2009, Thomas Chester
+ * @license http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
+ * @version 1.0.2
  */
 
+/**
+ * Interface describing the types of data and metadata that
+ * are available from the pdf2text object.
+ * @access public
+ * @package Pdf2Text
+ * @author Thomas Chester
+ */
 interface TChester_iPDFInfo
 {
+    /**
+     * The document's title.
+     * @return string
+     * @access public
+     */
     public function getTitle();
+
+    /**
+     * The name of the person who created the document.
+     * @return string
+     * @access public
+     */
     public function getAuthor();
+
+    /**
+     * The subject of the document.
+     * @return string
+     * @access public
+     */
     public function getSubject();
+
+    /**
+     * Keywords associated with the document.
+     * @return string
+     * @access public
+     */
     public function getKeywords();
+
+    /**
+     * The name of the application that originally created the document
+     * before it was converted to PDF format.
+     * @return string
+     * @access public
+     */
     public function getCreator();
+
+    /**
+     * The name of the application that converted the original document
+     * into PDF format.
+     * @return string
+     * @access public
+     */
     public function getProducer();
+
+    /**
+     * The human-readable date and time when the PDF was created.
+     * @return string
+     * @access public
+     */
     public function getCreationDate();
+
+    /**
+     * The human-readable date and time of the most recent modification.
+     * @return string
+     * @access public
+     */
     public function getModDate();
+
+    /**
+     * The textual contents of the PDF file.
+     * @return string
+     * @access public
+     */
     public function getContents();
 }
 
+/**
+ * Interface describing the types of structural data that
+ * is available from the pdf2text object.
+ * @access public
+ * @package Pdf2Text
+ * @author Thomas Chester
+ */
 interface TChester_iPDFStructure
 {
+    /**
+     * Retrieves the parsed Header section of the PDF file.
+     * @return string
+     * @access public
+     */
     public function getHeader();
+
+    /**
+     * Retrieves the parsed Trailer section of the PDF file.
+     * @return string
+     * @access public
+     */
     public function getTrailer();
+
+    /**
+     * Retrieves the parsed Body section of the PDF file.
+     * @return string
+     * @access public
+     */
     public function getBody();
+
+    /**
+     * Retrieves the parsed Cross-Reference section of the PDF file.
+     * @return string
+     * @access public
+     */
     public function getXref();
 }
 
+/**
+ * Class wrapper around an array of key/value pairs
+ * Here is an example:
+ * <code>
+ * <?php
+ *     $bag = new TChester_StructureBag(); // Creates new bag
+ *     $bag->title = "My Title";           // Key/value "title" ==> "My Title"
+ *     $title = $bag->title;               // Get "My Title" using "title" key
+ *     $name = $bag->name;                 // Error - key does not exist
+ * ?>
+ * </code>
+ * @access public
+ * @package Pdf2Text
+ * @author Thomas Chester
+ */
 class TChester_StructureBag
 {
+    /**
+     * Internal stored is implemented as key/value pairs
+     * @var array
+     * @access private
+     */
     private $_data = array();
     
+    /**
+     * Default constructor
+     * @access public
+     */
     public function __construct()
     {
-        
+        // Reserved for future use.
     }
     
+    /**
+     * Add a key/value pair to the collection, if the
+     * key already exists, its value will be overwritten.
+     * @param string $name Key to associate with value
+     * @param mixed $value Value to store
+     * @return void
+     * @access public
+     */
     public function __set($name, $value)
     {
         $this->_data[$name] = $value;
     }
     
+    /**
+     * Retrieves a value for a specified key, if the key
+     * does not exist an error will be triggered.
+     * @param $name Key to retrieve value for
+     * @return mixed Value associated with key or null if error occurred
+     * @access public
+     */
     public function __get($name)
     {
         if (array_key_exists($name, $this->_data)) {
             return $this->_data[$name];
         }
         
+        // An undefined array key will trigger an error
         $trace = debug_backtrace();
         trigger_error(
             "Undefined property via __get(): " . $name .
@@ -69,35 +208,192 @@ class TChester_StructureBag
     
 }
 
-
+/**
+ * Class to extract text contents and metadata out of a document that was
+ * created using the Adobe Portable Document Format.
+ *
+ * WARNING: The PDF 1.4 specification allows incremental updates
+ * to the PDF which could result in appearance of multiple body, cross-
+ * reference, and trailer sections. This class has not been tested using
+ * such a PDF file and the output of the public interfaces is unknown. It
+ * is assumed this incremental updating is the exception
+ * rather than the norm.
+ * 
+ * Here is an example showing how to get the contents and metadata:
+ * <code>
+ *    $object   = new TChester_Pdf2Text("document1.pdf");
+ *    $contents = $object->getContent();
+ *    $title    = $object->getTitle();
+ *    $author   = $object->getAuthor();
+ *    $subject  = $object->getSubject();
+ *    $keywords = $object->getKeywords();
+ *    $creator  = $object->getCreator();
+ *    $producer = $object->getProducer();
+ *    $created  = $object->getCreationDate();
+ *    $modified = $object->getModDate();
+ * </code> 
+ * @link http://www.adobe.com/devnet/pdf/pdf_reference.html PDF Reference
+ * @access public
+ * @package Pdf2Text
+ * @author Thomas Chester
+ */
 class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
 {
+    /**
+     * The PDF title from the metadata
+     * @var string
+     * @access private
+     */
     private $_title        = "";
+
+    /**
+     * The PDF author from the metadata
+     * @var string
+     * @access private
+     */
     private $_author       = "";
+
+    /**
+     * The PDF subject from the metadata
+     * @var string
+     * @access private
+     */
     private $_subject      = "";
+
+    /**
+     * The PDF keywords from the metadata
+     * @var string
+     * @access private
+     */
     private $_keywords     = "";
+
+    /**
+     * The PDF keywords from the metadata of Apple generated PDF's
+     * @var string
+     * @access private
+     */
     private $_aaplKeywords = "";
+
+    /**
+     * The PDF creator from the metadata
+     * @var string
+     * @access private
+     */
     private $_creator      = "";
+
+    /**
+     * The PDF producer from the metadata
+     * @var string
+     * @access private
+     */
     private $_producer     = "";
+
+    /**
+     * The PDF creation date from the metadata
+     * @var string
+     * @access private
+     */
     private $_creationDate = "";
+
+    /**
+     * The PDF last modification date title from the metadata
+     * @var string
+     * @access private
+     */
     private $_modDate      = "";
+
+    /**
+     * The PDF text content from the body section
+     * @var string
+     * @access private
+     */
     private $_contents     = "";
     
+    /**
+     * The contents of the PDF header section
+     * @var TChester_StructureBag
+     * @access private
+     */
     private $_bagHeader    = "";
+
+    /**
+     * The contents of the PDF trailer section
+     * @var TChester_StructureBag
+     * @access private
+     */
     private $_bagTrailer   = "";
+
+    /**
+     * The contents of the PDF body section
+     * @var TChester_StructureBag
+     * @access private
+     */
     private $_bagBody      = "";
+
+    /**
+     * The contents of the PDF cross reference section
+     * @var TChester_StructureBag
+     * @access private
+     */
     private $_bagXref      = "";
 
+    /**
+     * Array of parsed objects from the PDF body. Each object is an
+     * array with the following keys: 'key', 'dictionary', 'stream'
+     * 'contents', 'probableText'.
+     * @var array
+     * @access private
+     */
     private $_aryObjects   = null;
+
+    /**
+     * Array of parsed info objects from the PDF trailer. The PDF
+     * specification defines the following as keys: 'Size', 'Prev',
+     * 'Root', 'Encrypt', 'Info', 'ID'. 'ID' is actually treated as
+     * 'ID1' and 'ID2' in the code.
+     * @var array
+     * @access private
+     */
     private $_aryInfoKeys  = null;
 
+    /**
+     * The PDF file being parsed
+     * @var string
+     * @access private
+     */
     private $_fileName     = "";
+
+    /**
+     * The current line read from the PDF file
+     * @var integer
+     * @access private
+     */
     private $_fileLine     = 0;
+
+    /**
+     * Contains the current line read from the input
+     * @var string
+     * @access private
+     * @uses _readLine() populated through this function
+     */
     private $_fileBuffer   = "";
+
+    /**
+     * File handle used by PHP file processing functions
+     * @var integer
+     * @access private
+     */
     private $_fileHandle   = 0;
 
+    /**
+     * Class constructor
+     * @param string $filename Name and path of PDF file
+     * @access public
+     */
     public function __construct($filename)
     {
+        // Without this setting, trying to parse Windows created PDF's on Mac/Unix
+        // or vice versa will not work correctly.
         ini_set('auto_detect_line_endings', true);
 
         $this->_bagHeader  = new TChester_StructureBag();
@@ -162,86 +458,177 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
         }
     } 
 
-    /* Interface: iPDFInfo */
+    /**
+     * Supports the iPDFInfo interface
+     * @return string
+     * @see TChester_iPDFInfo::getTitle()
+     * @access public
+     */
     public function getTitle()        
     { 
         return $this->_title;        
     }
     
+    /**
+     * Supports the iPDFInfo interface
+     * @return string
+     * @see TChester_iPDFInfo::getAuthor()
+     * @access public
+     */
     public function getAuthor()       
     { 
         return $this->_author;       
     }
     
+    /**
+     * Supports the iPDFInfo interface
+     * @return string
+     * @see TChester_iPDFInfo::getSubject()
+     * @access public
+     */
     public function getSubject()      
     { 
         return $this->_subject;      
     }
     
+    /**
+     * Supports the iPDFInfo interface
+     * @return string
+     * @see TChester_iPDFInfo::getKeywords()
+     * @access public
+     */
     public function getKeywords()     
     { 
         return $this->_keywords;     
     }
     
+    /**
+     * Supports the iPDFInfo interface
+     * @return string
+     * @see TChester_iPDFInfo::getCreator()
+     * @access public
+     */
     public function getCreator()      
     { 
         return $this->_creator;      
     }
     
+    /**
+     * Supports the iPDFInfo interface
+     * @return string
+     * @see TChester_iPDFInfo::getProducer()
+     * @access public
+     */
     public function getProducer()     
     { 
         return $this->_producer;     
     }
     
+    /**
+     * Supports the iPDFInfo interface
+     * @return string
+     * @see TChester_iPDFInfo::getCreationDate()
+     * @access public
+     */
     public function getCreationDate() 
     { 
         return $this->_creationDate; 
     }
     
+    /**
+     * Supports the iPDFInfo interface
+     * @return string
+     * @see TChester_iPDFInfo::getModDate()
+     * @access public
+     */
     public function getModDate()      
     { 
         return $this->_modDate;      
     }
     
+    /**
+     * Supports the iPDFInfo interface
+     * @return string
+     * @see TChester_iPDFInfo::getContents()
+     * @access public
+     */
     public function getContents()     
     { 
         return $this->_contents;     
     }
     
-    /* Interface: iPDFStructure */
+    /**
+     * Supports the iPDFStructure interface
+     * @return string
+     * @see TChester_iPDFStructure::getHeader()
+     * @access public
+     */
     public function getHeader()       
-    { 
+    {
         return $this->_bagHeader;    
     }
     
+    /**
+     * Supports the iPDFStructure interface
+     * @return string
+     * @see TChester_iPDFStructure::getTrailer()
+     * @access public
+     */
     public function getTrailer()      
     { 
         return $this->_bagTrailer;   
     }
     
+    /**
+     * Supports the iPDFStructure interface
+     * @return string
+     * @see TChester_iPDFStructure::getBody()
+     * @access public
+     */
     public function getBody()     
     { 
         return $this->_bagBody;      
     }
     
+    /**
+     * Supports the iPDFStructure interface
+     * @return string
+     * @see TChester_iPDFStructure::getXref()
+     * @access public
+     */
     public function getXref()         
     { 
         return $this->_bagXref;      
     }
 
+    /**
+     * Processes the PDF file header, which consists of a single
+     * line with a format like: %PDF?#.#
+     * @return void
+     * @access private
+     */
     private function _processPDFHeader($matches)
     {
         //echo "\nPDF Header\n";
-        $this->_bagHeader->header  = $matches[0];
-        $this->_bagHeader->version = $matches[1];
+        $this->_bagHeader->header  = $matches[0]; // matched line
+        $this->_bagHeader->version = $matches[1]; // version part only
         $this->_seenHeader = true;
     }
 
+    /**
+     * Processes the PDF file body, which consists of a series
+     * of object blocks like: obj ... endobj. The 'obj' tag may
+     * contain metadata contained between '<<' and '>>' delimiters.
+     * Also the object may contain an embedded stream object
+     * which will be delimited by 'stream' and 'endstream' tags.
+     * @return void
+     * @access private
+     */
     private function _processPDFBody($matches)
     {
         //echo "\nPDF Body\n";
 
-         $key          = $matches[1];
+        $key          = $matches[1];
         $dictionary   = "";
         $stream       = "";
         $contents     = "";
@@ -253,16 +640,19 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
         
         $startIdx = strpos($contents, "<<", 0);
         $stopIdx  = strpos($contents, ">>", $startIdx) + 2;
-        
+      
+        // Parse out object metadata, if it exists  
         if ($startIdx !== false && $stopIdx !== false)
             $dictionary = substr($contents, $startIdx, $stopIdx - $startIdx);
         
         $startIdx = strpos($contents, "stream", 0) + strlen("stream");
         $stopIdx  = strpos($contents, "endstream", 0);
         
+        // Determine if the object contains an embedded stream object
         if ($startIdx !== false && $stopIdx !== false)
             $stream = substr($contents, $startIdx, $stopIdx - $startIdx);
-        
+
+        // Object does not contain an embedded stream object        
         if ($stream != "") {
             $contents   = $this->_getStreamData($dictionary, $stream);
 
@@ -275,6 +665,8 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
             else
               $probableText = false;
         } else {
+            // Object contains an embedded stream object so we want to eliminate
+            // any non-text containing objects such as images
             if (strpos($dictionary, "/Device", 0) === false &&
                 strpos($dictionary, "/Image", 0) === false &&
                 strpos($dictionary, "/Metadata", 0) === false) {
@@ -296,11 +688,24 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
         $this->_bagBody->objects = $this->_aryObjects;
     }
 
+    /**
+     * Processes the PDF cross reference section, whose start is
+     * identified by a line containing only the tag: xref.
+     * @return void
+     * @access private
+     */
     private function _processPDFXref($matches)
     {
         //echo "\nPDF Xref\n";
     }
 
+    /**
+     * Processes the PDF trailer section, whose start is
+     * identified by a line containing only the tag: 'trailer'
+     * and goes until the '%%EOF' tag.
+     * @return void
+     * @access private
+     */
     private function _processPDFTrailer($matches)
     {
         //echo "\nPDF Trailer\n";
@@ -349,6 +754,15 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
         $this->_seenTrailer = true;
     }
 
+    /**
+     * Parses out the PDF metadata section. The info blocks can
+     * either be stored inline or contain an indirect object
+     * reference. In indirect reference will be used as a key
+     * into the object array to get the contents, otherwise the
+     * inline content will be parsed out.
+     * @return void
+     * @access private
+     */
     private function _processPDFInfoBlock()
     {
         $info = $this->_bagTrailer->info;
@@ -426,6 +840,7 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
             }
         }
         
+        // Creation date looks like: "(D:20090922191205Z00'00')"
         $patternCreationDate = "/\/CreationDate\s{0,1}(\d+\s{0,1}\d+)\s{0,1}R/";
         
         if (1 == preg_match($patternCreationDate, $data, $matches)) {
@@ -439,6 +854,7 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
             }
         }
         
+        // Modification date looks like: "(D:20090922191205Z00'00')"
         $patternModDate = "/\/ModDate\s{0,1}(\d+\s{0,1}\d+)\s{0,1}R/";
         
         if (1 == preg_match($patternModDate, $data, $matches)) {
@@ -452,6 +868,7 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
             }
         }
         
+        // Keywords look like: "(keyword1, keyword2, keyword3)"
         $patternKeywords = "/\/Keywords\s{0,1}(\d+\s{0,1}\d+)\s{0,1}R/";
         
         if (1 == preg_match($patternKeywords, $data, $matches)) {
@@ -465,6 +882,7 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
             }
         }
 
+        // AAPL keywords look like: "[ (keyword1) (keyword2) (keyword3) ]"
         $patternAaplKeywords = "/\/AAPL\:Keywords\s{0,1}(\d+\s{0,1}\d+)\s{0,1}R/";
         
         if (1 == preg_match($patternAaplKeywords, $data, $matches)) {
@@ -474,6 +892,15 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
 
     }
 
+    /**
+     * Loops through the internal array of objects and if
+     * object is identified as probably containing text then
+     * its value is added to the parsed contents variable. At
+     * the end of this routine, the PDF contents will have all
+     * been consolidated to the final output variables.
+     * @return void
+     * @access private
+     */
     private function _processContents()
     {
         $contents  = "";
@@ -492,6 +919,15 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
         $this->_contents = $contents;
     }
 
+    /**
+     * Searches the internal array of objects for the specified
+     * id and returns either the content or dictionary values
+     * associated with that object.
+     * @param $id Id of object to get values for
+     * @param $wantContent True, returns contents, else returns dictionary
+     * @return string
+     * @access private
+     */
     private function _getContentBlockById($id, $wantContent)
     {
         foreach ($this->_bagBody->objects as $obj)
@@ -503,6 +939,13 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
         return "";
     }
 
+    /**
+     * Processes a stream contained within an object
+     * @param $header Enclosing object's metadata
+     * @param $data Stream object to parse
+     * @return mixed False if stream format not handled otherwise contents of stream
+     * @access private
+     */
     private function _getStreamData($header, $data)
     {
         if (strpos($header, "/Device", 0) !== false ||
@@ -525,14 +968,23 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
             if (substr($data, 0, 1) == "\n")
                 $offset = 1;
 
-        $contents = gzuncompress(substr($data, $offset, strlen($data) - ($offset * 2)));
+            $contents = gzuncompress(substr($data, $offset, strlen($data) - ($offset * 2)));
 
-        //echo "\n\nUncompressed Contents: " . htmlentities($contents) . "\n\n";
+            //echo "\n\nUncompressed Contents: " . htmlentities($contents) . "\n\n";
 
-        return $this->_getStreamEmbeddedData($contents, true);
+            return $this->_getStreamEmbeddedData($contents, true);
         }
     }
 
+    /**
+     * Parses the contents out of stream object. If stream object is
+     * compressed then it must be uncompressed first before calling
+     * this function.
+     * @param $data Stream data to parse
+     * @param $wasCompressed Indicates that stream data was uncompressed
+     * @return string
+     * @access private
+     */
     private function _getStreamEmbeddedData($data, $wasCompressed = true)
     {
         $char      = "";
@@ -571,6 +1023,15 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
     }
     
 
+    /**
+     * Reads lines into a buffer until a line is read that
+     * contains the specified stop pattern. The returned
+     * results will contain the stop pattern matched text
+     * as well.
+     * @param $patternStop Regex pattern that identifies end of block
+     * @return string
+     * @access private
+     */
     private function _readToEndOfBlock($patternStop)
     {
         $buffer = "";
@@ -587,6 +1048,11 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
         
     }
 
+    /**
+     * Reads a single line of input into an internal buffer
+     * @access private
+     * @return integer 1 if a line was read, 0 if end of file
+     */
     private function _readLine()
     {
         if (!feof($this->_fileHandle)) {
