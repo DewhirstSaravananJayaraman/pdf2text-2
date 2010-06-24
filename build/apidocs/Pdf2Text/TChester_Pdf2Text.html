@@ -115,17 +115,19 @@ Source Location: /Pdf2Text.php<br /><br />
 <a name="class_details"></a>
 <h3>Class Details</h3>
 <div class="tags">
-[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a240">240</a>]<br />
-Class to extract text contents and metadata out of a document that was  created using the Adobe Portable Document Format.<br /><br /><p>WARNING: The PDF 1.4 specification allows incremental updates  to the PDF which could result in appearance of multiple body, cross-  reference, and trailer sections. This class has not been tested using  such a PDF file and the output of the public interfaces is unknown. It  is assumed this incremental updating is the exception  rather than the norm.</p><p>Here is an example showing how to get the contents and metadata:  <ol><li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$object&nbsp;&nbsp;&nbsp;</span>=&nbsp;<span class="src-key">new&nbsp;</span><span class="src-id"><a href="../Pdf2Text/TChester_Pdf2Text.html">TChester_Pdf2Text</a></span><span class="src-sym">(</span><span class="src-str">&quot;document1.pdf&quot;</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$contents&nbsp;</span>=&nbsp;<span class="src-var">$object</span><span class="src-sym">-&gt;</span><span class="src-id">getContent</span><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$title&nbsp;&nbsp;&nbsp;&nbsp;</span>=&nbsp;<span class="src-var">$object</span><span class="src-sym">-&gt;</span><a href="../Pdf2Text/TChester_Pdf2Text.html#methodgetTitle">getTitle</a><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$author&nbsp;&nbsp;&nbsp;</span>=&nbsp;<span class="src-var">$object</span><span class="src-sym">-&gt;</span><a href="../Pdf2Text/TChester_Pdf2Text.html#methodgetAuthor">getAuthor</a><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$subject&nbsp;&nbsp;</span>=&nbsp;<span class="src-var">$object</span><span class="src-sym">-&gt;</span><a href="../Pdf2Text/TChester_Pdf2Text.html#methodgetSubject">getSubject</a><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$keywords&nbsp;</span>=&nbsp;<span class="src-var">$object</span><span class="src-sym">-&gt;</span><a href="../Pdf2Text/TChester_Pdf2Text.html#methodgetKeywords">getKeywords</a><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$creator&nbsp;&nbsp;</span>=&nbsp;<span class="src-var">$object</span><span class="src-sym">-&gt;</span><a href="../Pdf2Text/TChester_Pdf2Text.html#methodgetCreator">getCreator</a><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$producer&nbsp;</span>=&nbsp;<span class="src-var">$object</span><span class="src-sym">-&gt;</span><a href="../Pdf2Text/TChester_Pdf2Text.html#methodgetProducer">getProducer</a><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$created&nbsp;&nbsp;</span>=&nbsp;<span class="src-var">$object</span><span class="src-sym">-&gt;</span><a href="../Pdf2Text/TChester_Pdf2Text.html#methodgetCreationDate">getCreationDate</a><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$modified&nbsp;</span>=&nbsp;<span class="src-var">$object</span><span class="src-sym">-&gt;</span><a href="../Pdf2Text/TChester_Pdf2Text.html#methodgetModDate">getModDate</a><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a245">245</a>]<br />
+Class to extract text contents and metadata out of a document that was  created using the Adobe Portable Document Format.<br /><br /><p>WARNING: The PDF 1.4 specification allows incremental updates  to the PDF which could result in appearance of multiple body, cross-  reference, and trailer sections. This class has not been tested using  such a PDF file and the output of the public interfaces is unknown. It  is assumed this incremental updating is the exception  rather than the norm.</p><p>NOTE: Encryption of PDF's is not supported, content and metadata will  not be available.</p><p>Here is an example showing how to get the contents and metadata:  <ol><li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$object&nbsp;&nbsp;&nbsp;</span>=&nbsp;<span class="src-key">new&nbsp;</span><span class="src-id"><a href="../Pdf2Text/TChester_Pdf2Text.html">TChester_Pdf2Text</a></span><span class="src-sym">(</span><span class="src-str">&quot;document1.pdf&quot;</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">if&nbsp;</span><span class="src-sym">(</span><span class="src-var">$trailer</span><span class="src-sym">-&gt;</span><span class="src-id">encrypt&nbsp;</span>===&nbsp;<span class="src-id">false</span><span class="src-sym">)&nbsp;</span><span class="src-sym">{</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$contents&nbsp;</span>=&nbsp;<span class="src-var">$object</span><span class="src-sym">-&gt;</span><span class="src-id">getContent</span><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$title&nbsp;&nbsp;&nbsp;&nbsp;</span>=&nbsp;<span class="src-var">$object</span><span class="src-sym">-&gt;</span><a href="../Pdf2Text/TChester_Pdf2Text.html#methodgetTitle">getTitle</a><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$author&nbsp;&nbsp;&nbsp;</span>=&nbsp;<span class="src-var">$object</span><span class="src-sym">-&gt;</span><a href="../Pdf2Text/TChester_Pdf2Text.html#methodgetAuthor">getAuthor</a><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$subject&nbsp;&nbsp;</span>=&nbsp;<span class="src-var">$object</span><span class="src-sym">-&gt;</span><a href="../Pdf2Text/TChester_Pdf2Text.html#methodgetSubject">getSubject</a><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$keywords&nbsp;</span>=&nbsp;<span class="src-var">$object</span><span class="src-sym">-&gt;</span><a href="../Pdf2Text/TChester_Pdf2Text.html#methodgetKeywords">getKeywords</a><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$creator&nbsp;&nbsp;</span>=&nbsp;<span class="src-var">$object</span><span class="src-sym">-&gt;</span><a href="../Pdf2Text/TChester_Pdf2Text.html#methodgetCreator">getCreator</a><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$producer&nbsp;</span>=&nbsp;<span class="src-var">$object</span><span class="src-sym">-&gt;</span><a href="../Pdf2Text/TChester_Pdf2Text.html#methodgetProducer">getProducer</a><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$created&nbsp;&nbsp;</span>=&nbsp;<span class="src-var">$object</span><span class="src-sym">-&gt;</span><a href="../Pdf2Text/TChester_Pdf2Text.html#methodgetCreationDate">getCreationDate</a><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$modified&nbsp;</span>=&nbsp;<span class="src-var">$object</span><span class="src-sym">-&gt;</span><a href="../Pdf2Text/TChester_Pdf2Text.html#methodgetModDate">getModDate</a><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li><div class="src-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-sym">}</span></div></li>
 </ol></p><br /><br /><br />
 <h4>Tags:</h4>
 <div class="tags">
@@ -152,7 +154,7 @@ Class to extract text contents and metadata out of a document that was  created 
 
   <hr />
 	<a name="method__construct"></a>
-	<h3>constructor __construct <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a393">393</a>]</span></h3>
+	<h3>constructor __construct <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a398">398</a>]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -188,7 +190,7 @@ $filename)</code>
   </div>
   <hr />
 	<a name="methodgetAuthor"></a>
-	<h3>method getAuthor <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a478">478</a>]</span></h3>
+	<h3>method getAuthor <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a488">488</a>]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -222,7 +224,7 @@ $filename)</code>
   </div>
   <hr />
 	<a name="methodgetBody"></a>
-	<h3>method getBody <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a588">588</a>]</span></h3>
+	<h3>method getBody <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a598">598</a>]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -256,7 +258,7 @@ $filename)</code>
   </div>
   <hr />
 	<a name="methodgetContents"></a>
-	<h3>method getContents <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a555">555</a>]</span></h3>
+	<h3>method getContents <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a565">565</a>]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -290,7 +292,7 @@ $filename)</code>
   </div>
   <hr />
 	<a name="methodgetCreationDate"></a>
-	<h3>method getCreationDate <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a533">533</a>]</span></h3>
+	<h3>method getCreationDate <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a543">543</a>]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -324,7 +326,7 @@ $filename)</code>
   </div>
   <hr />
 	<a name="methodgetCreator"></a>
-	<h3>method getCreator <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a511">511</a>]</span></h3>
+	<h3>method getCreator <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a521">521</a>]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -358,7 +360,7 @@ $filename)</code>
   </div>
   <hr />
 	<a name="methodgetHeader"></a>
-	<h3>method getHeader <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a566">566</a>]</span></h3>
+	<h3>method getHeader <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a576">576</a>]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -392,7 +394,7 @@ $filename)</code>
   </div>
   <hr />
 	<a name="methodgetKeywords"></a>
-	<h3>method getKeywords <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a500">500</a>]</span></h3>
+	<h3>method getKeywords <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a510">510</a>]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -426,7 +428,7 @@ $filename)</code>
   </div>
   <hr />
 	<a name="methodgetModDate"></a>
-	<h3>method getModDate <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a544">544</a>]</span></h3>
+	<h3>method getModDate <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a554">554</a>]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -460,7 +462,7 @@ $filename)</code>
   </div>
   <hr />
 	<a name="methodgetProducer"></a>
-	<h3>method getProducer <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a522">522</a>]</span></h3>
+	<h3>method getProducer <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a532">532</a>]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -494,7 +496,7 @@ $filename)</code>
   </div>
   <hr />
 	<a name="methodgetSubject"></a>
-	<h3>method getSubject <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a489">489</a>]</span></h3>
+	<h3>method getSubject <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a499">499</a>]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -528,7 +530,7 @@ $filename)</code>
   </div>
   <hr />
 	<a name="methodgetTitle"></a>
-	<h3>method getTitle <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a467">467</a>]</span></h3>
+	<h3>method getTitle <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a477">477</a>]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -562,7 +564,7 @@ $filename)</code>
   </div>
   <hr />
 	<a name="methodgetTrailer"></a>
-	<h3>method getTrailer <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a577">577</a>]</span></h3>
+	<h3>method getTrailer <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a587">587</a>]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -596,7 +598,7 @@ $filename)</code>
   </div>
   <hr />
 	<a name="methodgetXref"></a>
-	<h3>method getXref <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a599">599</a>]</span></h3>
+	<h3>method getXref <span class="smalllinenumber">[line <a href="../__filesource/fsource_Pdf2Text__Pdf2Text.php.html#a609">609</a>]</span></h3>
 	<div class="function">
     <table width="90%" border="0" cellspacing="0" cellpadding="1"><tr><td class="code_border">
     <table width="100%" border="0" cellspacing="0" cellpadding="2"><tr><td class="code">
@@ -633,7 +635,7 @@ $filename)</code>
 
         <div class="credit">
 		    <hr />
-		    Documentation generated on Tue, 15 Jun 2010 20:31:19 -0400 by <a href="http://www.phpdoc.org">phpDocumentor 1.4.3</a>
+		    Documentation generated on Thu, 24 Jun 2010 19:52:13 -0400 by <a href="http://www.phpdoc.org">phpDocumentor 1.4.3</a>
 	      </div>
       </td></tr></table>
     </td>

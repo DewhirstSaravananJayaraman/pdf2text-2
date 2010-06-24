@@ -19,7 +19,7 @@
  * @link https://launchpad.net/pdf2text Pdf2Text Project
  * @copyright Copyright 2009, Thomas Chester
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
- * @version 1.0.2
+ * @version 1.1.0
  */
 
 /**
@@ -219,18 +219,23 @@ class TChester_StructureBag
  * is assumed this incremental updating is the exception
  * rather than the norm.
  * 
+ * NOTE: Encryption of PDF's is not supported, content and metadata will
+ * not be available.
+ *
  * Here is an example showing how to get the contents and metadata:
  * <code>
  *    $object   = new TChester_Pdf2Text("document1.pdf");
- *    $contents = $object->getContent();
- *    $title    = $object->getTitle();
- *    $author   = $object->getAuthor();
- *    $subject  = $object->getSubject();
- *    $keywords = $object->getKeywords();
- *    $creator  = $object->getCreator();
- *    $producer = $object->getProducer();
- *    $created  = $object->getCreationDate();
- *    $modified = $object->getModDate();
+ *    if ($trailer->encrypt === false) {
+ *        $contents = $object->getContent();
+ *        $title    = $object->getTitle();
+ *        $author   = $object->getAuthor();
+ *        $subject  = $object->getSubject();
+ *        $keywords = $object->getKeywords();
+ *        $creator  = $object->getCreator();
+ *        $producer = $object->getProducer();
+ *        $created  = $object->getCreationDate();
+ *        $modified = $object->getModDate();
+ *    }
  * </code> 
  * @link http://www.adobe.com/devnet/pdf/pdf_reference.html PDF Reference
  * @access public
@@ -396,6 +401,10 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
         // or vice versa will not work correctly.
         ini_set('auto_detect_line_endings', true);
 
+        // We are going to suppress errors while executing certain code statements
+        // but we still want to preserve any errors for output.
+        ini_set('track_errors', true);
+
         $this->_bagHeader  = new TChester_StructureBag();
         $this->_bagTrailer = new TChester_StructureBag();
         $this->_bagBody    = new TChester_StructureBag();
@@ -417,6 +426,7 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
         $this->_bagTrailer->id1       = "";
         $this->_bagTrailer->id2       = "";
         $this->_bagTrailer->startXref = 0;
+        $this->_bagTrailer->encrypted = false;
         $this->_bagTrailer->eof       = "%%EOF";
         
         $patternHeader  = "/^%PDF-(\d+\.\d+)$/";
@@ -667,14 +677,10 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
         } else {
             // Object contains an embedded stream object so we want to eliminate
             // any non-text containing objects such as images
-            if (strpos($dictionary, "/Device", 0) === false &&
-                strpos($dictionary, "/Image", 0) === false &&
-                strpos($dictionary, "/Metadata", 0) === false) {
-                $contents = $this->_getStreamEmbeddedData(
-                    substr($contents, strlen($dictionary)), false
-                );
-                $probableText = true;
-            }
+            $contents = $this->_getStreamEmbeddedData(
+                substr($contents, strlen($dictionary)), false
+            );
+            $probableText = !($contents === false && $this->_bagTrailer->encrypt === false);
         }
         
         $this->_aryObjects[] = array(
@@ -746,11 +752,16 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
         if (1 == preg_match($patternPrev, $this->_bagTrailer->dictionary, $matches))
             $this->_bagTrailer->prev = $matches[1];
 
+        $patternEncrypt = "/\/Encrypt/";
+        
+        if (1 == preg_match($patternEncrypt, $contents, $matches))
+            $this->_bagTrailer->encrypt = true;
+
         $patternStartXref = "/startxref\s*(\d+)\s*%%EOF/";
         
         if (1 == preg_match($patternStartXref, $contents, $matches))
             $this->_bagTrailer->startXref = $matches[1];
-        
+
         $this->_seenTrailer = true;
     }
 
@@ -911,10 +922,7 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
                     $isInfoKey = true;
                     
             if ($obj['probableText'] == true && !$isInfoKey)
-                if ($contents == "")
-                    $contents = trim($obj['contents']);
-                else
-                    $contents .= " " . trim($obj['contents']);
+                $contents .= $obj['contents'];
         }        
         $this->_contents = $contents;
     }
@@ -948,29 +956,82 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
      */
     private function _getStreamData($header, $data)
     {
+        // Non-text stream objects such as images
         if (strpos($header, "/Device", 0) !== false ||
             strpos($header, "/Image", 0) !== false ||
-            strpos($header, "/Metadata", 0) !== false)
-          return false;
+            strpos($header, "/Metadata", 0) !== false ||
+            strpos($header, "/ColorSpace", 0) !== false) 
+            return false; // "** Device|Image|Metadata **"
+
+        // Encodings we are not able to parse yet	
+        if (strpos($header, "/ASCIIHexDecode", 0) !== false ||
+            strpos($header, "/ASCII85Decode", 0) !== false ||
+            strpos($header, "/LZWDecode", 0) !== false ||
+            strpos($header, "/RunLengthDecode", 0) !== false ||
+            strpos($header, "/CCITTFaxDecode", 0) !== false ||
+            strpos($header, "/DCTDecode", 0) !== false)
+            return false; // "** Unhandled Encoding **"
+                        
+        // Filter out PDF hint tables
+        if (1 == preg_match("/\/[LS]\s{0,1}\d+/", $header, $matches)) {
+            return false; //"** HINT TABLE **";
+        }
+        
+        // Filter out font program information
+        if (1 == preg_match("/\/Length[123]\s{0,1}\d+/", $header, $matches))
+            return false; //"** FONT PROGRAM **";  
+
+        // PDF is encrypted
+        if ($this->_bagTrailer->encrypt == true)
+            return false; //"** ENCRYPTED **";
 
         if (strpos($header, "/FlateDecode", 0) === false) {
             // Stream is plain text
             return $this->_getStreamEmbeddedData($data, false);
         } else {
-            // Stream encoded with zlib compress function === FlateDecode
-            $offset = 0;
+            // Stream is compressed text using zlib (i.e. FlateDecode) 
+            $startPos = 1;  // Assume one line stream tag separator
+            $endPos = 1;    // Assume one line endstream tag separator
+            $length = 0;
 
-            // Windows line separator encoding
+            // Check for Carriage Return + Line Feed after stream tag
             if (substr($data, 0, 1) == "\r" && substr($data, 1, 1) == "\n")
-                $offset = 2;
+                $startPos = 2;
 
-            // UNIX line separator encoding
-            if (substr($data, 0, 1) == "\n")
-                $offset = 1;
+            // Check for Carriage Return + Line Feed before endstream tag
+            if (substr($data, -2, 1) == "\r" && substr($data, -1, 1) == "\n")
+                $endPos = 2;    
 
-            $contents = gzuncompress(substr($data, $offset, strlen($data) - ($offset * 2)));
+            // If the length is an indirect object reference that has a format
+            // like "/Length # # R" where # # is the key of the referenced
+            // object whose contents contain the stream length value. In this 
+            // case we will just take the shortcut evaluation of the length using
+            // stream/endstream positions and removing the leading separators. NOTE:
+            // there does not appear to be trailing separators used here so we are
+            // ignoring the endpos calculation in the length.
+            if (1 == preg_match("/\/Length\s{0,1}\d+\s{0,1}\d+\s{0,1}R/", $header, $matches)) {
+                $length = strlen($data) - $startPos;
+            } else {
+                // A direct length value is stored in the header and has a format
+                // like: "/Length #"
+                preg_match("/\/Length\s{0,1}(\d+)/", $header, $matches);
+                $length = $matches[1];
+            }
 
-            //echo "\n\nUncompressed Contents: " . htmlentities($contents) . "\n\n";
+            $php_errormsg = "";
+            $contents = @gzuncompress(substr($data, $startPos, $length));
+
+            if ($php_errormsg != "") {
+                echo "Warning: " . htmlentities($php_errormsg) . " in " 
+                    . htmlentities(__FILE__) . " near line " 
+                    . htmlentities(__LINE__) . "\n";
+                //echo "DEBUG: Header  : " . htmlentities($header) . "\n";
+                //echo "DEBUG: Length  : " . htmlentities($length) . "\n";
+                //echo "DEBUG: StartPos: " . htmlentities($startPos) . "\n";
+                //echo "DEBUG: EndPos  : " . htmlentities($endPos) . "\n";
+            }
+
+            //echo "DEBUG:Uncompressed Contents: " . htmlentities($contents) . "\n\n";
 
             return $this->_getStreamEmbeddedData($contents, true);
         }
@@ -992,36 +1053,28 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
         $results   = "";
         $tjFollows = false;
 
+        // Parentheses are used to delimit text streams, but those text
+        // streams may also contain embedded parentheses. We want to
+        // replace the embedded parenteses with brackets so our match
+        // expression is not affected.
         $data = str_replace("\(", "[", $data);
         $data = str_replace("\)", "]", $data);
 
-        for ($i = 0; $i < strlen($data); $i++) {
-            $char = substr($data, $i, 1);
+        //echo "DEBUG: Stream: " . htmlentities($data) . "\n";
 
-            if ($char == "(") {
-                $paren     = true;
-                $tjFollows = false;
+        $reg = "/(\([^()]+\))/im";
+
+        if (0 < preg_match_all($reg, $data, $matches)) {
+            foreach ($matches[0] as $entry) {
+                //echo "DEBUG: Match: " . htmlentities($entry) . "\n";
+                $results .= substr($entry, 1, -1);
             }
-
-            if ($char == ")") {
-                $paren = false;
-                
-                if ("Tj" == substr($data, $i+1, 2))
-                    $tjFollows = true;
-            }
-
-            if ($char == ")" && (!$wasCompressed || $tjFollows)) 
-                $results .= " ";
-            
-            //if ($char == ")" && $tjFollows == true) $results .= "\n";
-
-            if ($paren == 1 && $char != "(" && $char != ")") 
-                $results .= $char;
         }
+
+        //echo "DEBUG:Stream Embedded Data: {{" . htmlentities($results) . "}}\n\n";
 
         return $results;
     }
-    
 
     /**
      * Reads lines into a buffer until a line is read that
