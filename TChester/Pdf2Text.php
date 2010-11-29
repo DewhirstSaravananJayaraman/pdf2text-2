@@ -978,7 +978,9 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
         }
         
         // Filter out font program information
-        if (1 == preg_match("/\/Length[123]\s{0,1}\d+/", $header, $matches))
+        if (1 == preg_match("/\/Length[123]\s{0,1}\d+/", $header, $matches) ||
+            1 == preg_match("/\/Subtype\/Type1C/", $header, $matches) ||
+            1 == preg_match("/\/Subtype\/CIDFontType0C/", $header, $matches))
             return false; //"** FONT PROGRAM **";  
 
         // PDF is encrypted
