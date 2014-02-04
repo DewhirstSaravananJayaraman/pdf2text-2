@@ -677,11 +677,14 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
         } else {
             // Object contains an embedded stream object so we want to eliminate
             // any non-text containing objects such as images
+
             $contents = $this->_getStreamEmbeddedData(
                 substr($contents, strlen($dictionary)), false
             );
             $probableText = !($contents === false && $this->_bagTrailer->encrypt === false);
         }
+
+		#print "Key: $key <br/> Stream: $stream <br/> Contents: $contents <br/>";
         
         $this->_aryObjects[] = array(
             "key"          => $key, 
@@ -724,7 +727,7 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
         $this->_bagTrailer->dictionary = substr(
             $contents, $startIdx, $stopIdx - $startIdx
         );
-    
+      
         $patternId = "/\/ID\s{0,1}\[\s{0,1}<(\d|\w+)>\s{0,1}<(\d|\w+)>\s{0,1}\]/";
     
         if (1 == preg_match($patternId, $this->_bagTrailer->dictionary, $matches)) {
@@ -978,9 +981,7 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
         }
         
         // Filter out font program information
-        if (1 == preg_match("/\/Length[123]\s{0,1}\d+/", $header, $matches) ||
-            1 == preg_match("/\/Subtype\/Type1C/", $header, $matches) ||
-            1 == preg_match("/\/Subtype\/CIDFontType0C/", $header, $matches))
+        if (1 == preg_match("/\/Length[123]\s{0,1}\d+/", $header, $matches))
             return false; //"** FONT PROGRAM **";  
 
         // PDF is encrypted
@@ -1023,6 +1024,8 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
             $php_errormsg = "";
             $contents = @gzuncompress(substr($data, $startPos, $length));
 
+            //print "Contents: $contents <br/>";
+            
             if ($php_errormsg != "") {
                 echo "Warning: " . htmlentities($php_errormsg) . " in " 
                     . htmlentities(__FILE__) . " near line " 
@@ -1059,17 +1062,20 @@ class TChester_Pdf2Text implements TChester_iPDFInfo, TChester_iPDFStructure
         // streams may also contain embedded parentheses. We want to
         // replace the embedded parenteses with brackets so our match
         // expression is not affected.
-        $data = str_replace("\(", "[", $data);
-        $data = str_replace("\)", "]", $data);
+        ////$data = str_replace("\(", "[", $data);
+        ////$data = str_replace("\)", "]", $data);
 
         //echo "DEBUG: Stream: " . htmlentities($data) . "\n";
 
-        $reg = "/(\([^()]+\))/im";
+        ////$reg = "/(\([^()]+\))/im";
 
-        if (0 < preg_match_all($reg, $data, $matches)) {
-            foreach ($matches[0] as $entry) {
-                //echo "DEBUG: Match: " . htmlentities($entry) . "\n";
-                $results .= substr($entry, 1, -1);
+        $reg = "/Td\s+\(([^()]+)\)\s+Tj/im";
+        
+        if (0 < preg_match_all($reg, $data, $matches, PREG_PATTERN_ORDER)) {
+            foreach ($matches[1] as $entry) {
+                //echo "DEBUG: Match: (" . htmlentities($entry) . ")\n";
+                ////$results .= substr($entry, 1, -1);
+                $results .= $entry . "\n";
             }
         }
 

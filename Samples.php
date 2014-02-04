@@ -12,7 +12,8 @@
 
 require_once("TChester/Pdf2Text.php");
 
-    $object = new TChester_Pdf2Text("./Samples/test_mac_flate_meta.pdf");
+  $object = new TChester_Pdf2Text("./Samples/09-00958qp.pdf");
+//  $object = new TChester_Pdf2Text("./Samples/test_mac_flate_meta.pdf");
 //	$object = new TChester_Pdf2Text("./Samples/test_mac_flate.pdf");
 //	$object = new TChester_Pdf2Text("./Samples/test_windows_flate_meta.pdf");
 //	$object = new TChester_Pdf2Text("./Samples/test_windows_flate.pdf");
@@ -46,19 +47,26 @@ require_once("TChester/Pdf2Text.php");
 <h3>PDF Trailer</h3>
 <?php
 	$trailer = $object->getTrailer();
-	echo "Dictionary (Raw)    : " . htmlentities($trailer->dictionary) . "\n";
-	echo "Dictionary (Id1)    : " . htmlentities($trailer->id1) . "\n";
-	echo "Dictionary (Id2)    : " . htmlentities($trailer->id2) . "\n";
-	echo "Dictionary (Root)   : " . htmlentities($trailer->root) . "\n";
-	echo "Dictionary (Info)   : " . htmlentities($trailer->info) . "\n";
-	echo "Dictionary (Size)   : " . htmlentities($trailer->size) . "\n";
-	echo "Dictionary (Prev)   : " . htmlentities($trailer->prev) . "\n";
-	if ($trailer->encrypt === true)
-	    echo "Dictionary (Encrypt): Yes\n";
-	else
-	    echo "Dictionary (Encrypt): No\n";
-	echo "Start Xref Offset   : " . htmlentities($trailer->startXref) . "\n";
-	echo "EOF                 : " . htmlentities($trailer->eof) . "\n";
+	
+	if (property_exists($trailer, "dictionary"))
+    {	
+		echo "Dictionary (Raw)    : " . htmlentities($trailer->dictionary) . "\n";
+		echo "Dictionary (Id1)    : " . htmlentities($trailer->id1) . "\n";
+		echo "Dictionary (Id2)    : " . htmlentities($trailer->id2) . "\n";
+		echo "Dictionary (Root)   : " . htmlentities($trailer->root) . "\n";
+		echo "Dictionary (Info)   : " . htmlentities($trailer->info) . "\n";
+		echo "Dictionary (Size)   : " . htmlentities($trailer->size) . "\n";
+		echo "Dictionary (Prev)   : " . htmlentities($trailer->prev) . "\n";
+		if ($trailer->encrypt === true)
+	    	echo "Dictionary (Encrypt): Yes\n";
+		else
+	    	echo "Dictionary (Encrypt): No\n";
+		echo "Start Xref Offset   : " . htmlentities($trailer->startXref) . "\n";
+		echo "EOF                 : " . htmlentities($trailer->eof) . "\n";
+	} else {
+		print "Trailer was not located.\n";
+	}
+	
 	echo "\n";
 ?>
 <hr>
@@ -82,7 +90,11 @@ require_once("TChester/Pdf2Text.php");
 	if ($trailer->encrypt === true)
 		echo "Contents are not available because PDF is encrypted.\n";
 	else
-		echo htmlentities($object->getContents());
+	{
+		$contents = $object->getContents();
+		//$contents = str_replace("\n", "<br />", $contents);
+		echo htmlentities($contents);
+	}
 ?>
 </p>
 </body>
